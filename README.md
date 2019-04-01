@@ -7,4 +7,4 @@ Elements of the sauna include
 - Air (a "scorth" factor of thermal mass will be investigated as well)
 - Walls
 
-One early interesting note is how a sauna moves from radiative to conductive heat transfer as it gets hotter.
+One early interesting note is how a sauna moves from radiative to convective heat transfer as it gets hotter.
