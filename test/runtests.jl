@@ -1,7 +1,7 @@
 using DifferentialEquations 
 using ParameterizedFunctions
-using Unitful:s,minute,°F, inch, ft,lb, g,kg,cm, Length, Area, W, J, kJ, m,Energy, kW, uconvert, Power, K, Temperature, σ, Time, hr, Pressure, Pa, g, R, Mass, atm
-using SaunaModel:Room, Stove, SaunaNoWater,build_sauna_model
+using Unitful:s,minute,°F, inch, ft,lb, g,kg,cm, Length, Area, W, J, kJ, m,Energy, kW, uconvert, Power, K, Temperature, σ, Time, hr, Pressure, Pa, g, R, Mass, atm, ustrip
+using SaunaModel:Room, Stove, SaunaNoWater,build_sauna_model, throw_steam!
 example_stove = let
     #http://saunawoodstove.com/
     exterior_surface_area_stove = 16inch*25inch*2 + 18inch*25inch*2 + 18inch*16inch*2
@@ -14,6 +14,9 @@ example_stove = let
     radius_pipe = 3inch
     #https://www.engineeringtoolbox.com/overall-heat-transfer-coefficients-d_284.html
     convection_coeff_cast_iron = 7.9W/(m^2*K)
+    #https://www.engineeringtoolbox.com/convective-heat-transfer-d_430.html
+    surface_area_thrown_water = 1m^2
+    convection_coeff_stove_water = 20W/(m^2*K)
     Stove(stove_mass_estimate, 
         rock_mass_estimate, 
         exterior_surface_area_stove, 
@@ -21,7 +24,10 @@ example_stove = let
         radius_pipe,
         rock_specific_heat, 
         stove_specific_heat, 
-        convection_coeff_cast_iron)
+        convection_coeff_cast_iron,
+        surface_area_thrown_water,
+        convection_coeff_stove_water
+        )
 end
 example_room = let
     height = 8ft
@@ -51,12 +57,14 @@ function fire_temperature(time::Time,max_temperature::Temperature, start_tempera
 end
 sauna = let
     start_temperature = 100°F
-    max_temperature = 2000°F
+    max_temperature = 2500°F
     fire_curve(time) =  fire_temperature(time,max_temperature, start_temperature )
     humidity_outside = 1212Pa*.3 #30% humidity
     pressure_outside = 1atm
     temperature_floor = 50°F   
     sauna_room_view_factor = .6
+    water_thrown_temperature = 40°F
+    scoop_size = 1lb
     SaunaNoWater(example_stove,
                 example_room,
                 fire_curve,
@@ -64,12 +72,19 @@ sauna = let
                 humidity_outside,
                 pressure_outside,
                 temperature_floor,
-                sauna_room_view_factor)
+                sauna_room_view_factor,
+                water_thrown_temperature,
+                scoop_size)
 end
 # build_sauna_model([0.0K/s,0.0K/s,0.0K/s,0.0Pa/s],  sauna::SaunaNoWater, 0s)
-initial_temperature = uconvert(K,50°F)
-u0 = [initial_temperature,initial_temperature,initial_temperature,1212Pa*.3]
-tspan = (0.0s,1.0hr)
+initial_temperature = ustrip(uconvert(K,51°F))
+u0 = [initial_temperature,initial_temperature,initial_temperature,ustrip(1212Pa*.3), ustrip(0kg), initial_temperature  ]
+tspan = (ustrip(0.0s),uconvert(s,1.0hr)|>ustrip)
 p = sauna
-prob = ODEProblem(build_sauna_model,u0,tspan,p)
-sol = solve(prob,Tsit5())
+ode_prob = ODEProblem(build_sauna_model,u0,tspan,p)
+steam_thrown_rate(u,p,t) = u[2]>uconvert(K,30°F)|>ustrip ? 1/120.0 : 0.0
+
+jump = ConstantRateJump(steam_thrown_rate,throw_steam!)
+jump_prob = JumpProblem(ode_prob,Direct(),jump)
+
+sol = solve(jump_prob,Tsit5())
