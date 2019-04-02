@@ -3,12 +3,13 @@ module SaunaModel
 using DifferentialEquations 
 using ParameterizedFunctions
 using Unitful:s, Length, Area, W, m,Energy, kW, kJ, J, uconvert, ustrip, Power, K, °C, Temperature, σ, Time, hr, Pressure, Pa, kg, g, R, Mass, Quantity, mol
+using JSON
  
 abstract type AbstractSauna end
 """
 fire_temperature is the average temperature of the fire
 room_mass is the weight of wood and other sundries being heated with the sauna, and in direct thermal exchange
-https://www.engineersedge.com/heat_transfer/convective_heat_transfer_coefficients__13378.htm
+include("api.jl")
 
 Diffusion of air:
 https://www.nature.com/articles/7500229
