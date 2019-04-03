@@ -1,15 +1,15 @@
 module SaunaModel
 
 using DifferentialEquations 
-using Unitful:s, Length, Area, Volume, W, m,Energy, kW, kJ, J, uconvert, ustrip, Power, K, °C, 
-        Temperature, σ, Time, Frequency, hr, Pressure, Pa, kg, g, R, Mass, Quantity, mol
+using Unitful:s, minute,°F, °C, inch, Length, Area, Volume, W, m,Energy, kW, kJ, J, uconvert, ustrip, Power, K, °C, 
+        Temperature, σ, Time, Frequency, hr, Pressure, Pa, atm, kg, g, R, Mass, Quantity, mol
 using JSON
  
 include("types.jl")
 include("heat_exchange.jl")
 include("air_turnover.jl")
 include("solve_sauna.jl")
-include("api.jl")
+include("api/api.jl")
 
 volume(room::Room)::Volume = room.height*room.width*room.depth
 outer_surface_area(room::Room)::Area = room.height*room.width*2 + room.height*room.depth*2 + room.height*room.width
@@ -41,9 +41,9 @@ function build_sauna_model(du, u, scenario, time)
     boiled_water_mol_rate = uconvert(mol/s, steam_heat_into_air/enthalpy_vaporization_water)
     humidity_pressure_bump = pressure_bump_rate_boiled_water(boiled_water_mol_rate, temperature_air, sauna.room)
     du[1] = uconvert(K/s,(fire_stove_heat_exchange - stove_room_heat_exchange - stove_air_heat_exchange)/ heat_capacity(sauna.stove))|>ustrip 
-    temperature_change_air_heat_exchange = (stove_air_heat_exchange - air_room_heat_exchange - air_floor_heat_exchange + steam_heat_into_air) / 
-        heat_capacity_wet_air(sauna.room, scenario.atmospheric_pressure, humidity_air, temperature_air)
-    temperature_change_air_mass_exchange = -(temperature_air -uconvert(K,scenario.temperature_outside) ) * air_turnover_portion
+    temperature_change_air_heat_exchange = uconvert(K/s,(stove_air_heat_exchange - air_room_heat_exchange - air_floor_heat_exchange + steam_heat_into_air) / 
+        heat_capacity_wet_air(sauna.room, scenario.atmospheric_pressure, humidity_air, temperature_air))
+    temperature_change_air_mass_exchange = uconvert(K/s,-(temperature_air -uconvert(K,scenario.temperature_outside) ) * air_turnover_portion)
     du[2] = uconvert(K/s, temperature_change_air_heat_exchange + temperature_change_air_mass_exchange)|>ustrip
     du[3] = uconvert(K/s, (stove_room_heat_exchange + air_room_heat_exchange - room_outside_conduction -room_floor_heat_exchange) / heat_capacity(sauna.room))|>ustrip
     du[4] = uconvert(Pa/s, -(humidity_air-scenario.humidity_outside) * air_turnover_portion + humidity_pressure_bump)|>ustrip

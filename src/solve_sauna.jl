@@ -1,5 +1,8 @@
+function experienced_temperature(mean_air_temperature::Temperature,temperature_floor::Temperature )::Temperature 
+    uconvert(K, temperature_floor)+(uconvert(K, mean_air_temperature)-uconvert(K, temperature_floor))*1.5
+end
 function steam_throwing(u,p,t)
-    uconvert(K, p.temperature_floor)+(u[2]K-uconvert(K, p.temperature_floor))*1.5 > p.steam_throwing.air_temperature_start_throwing ? uconvert(s^-1,p.steam_throwing.rate)|>ustrip : 0.0
+    experienced_temperature(u[2]K, p.temperature_floor)> p.steam_throwing.air_temperature_start_throwing ? uconvert(s^-1,p.steam_throwing.rate)|>ustrip : 0.0
 end
 function solve_sauna(scenario::SaunaScenario )::SaunaResults
     stripped_stove_temperature = uconvert(K,scenario.initial_temperature_stove)|>ustrip
