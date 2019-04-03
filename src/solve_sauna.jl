@@ -39,7 +39,6 @@ end
 integrator is from DifferentialEquations
 """
 function throw_steam!(integrator)
-    println("Steam thrown!")
     mass_thrown = uconvert(kg,integrator.p.steam_throwing.scoop_size)|>ustrip
     new_mass_of_water = integrator.u[5] + mass_thrown
     integrator.u[6] = (integrator.u[6] * integrator.u[5] + ustrip(uconvert(K, integrator.p.steam_throwing.water_thrown_temperature)) * mass_thrown)/new_mass_of_water

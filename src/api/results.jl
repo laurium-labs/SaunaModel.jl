@@ -17,9 +17,8 @@ function apparent_temperature(temperature::Temperature, relative_humidity_ratio:
     - 5.48*10^-2*relative_humidity^2 + 1.2287*10^-3*farenheit_temp^2*relative_humidity + 8.528*10^-4*farenheit_temp*relative_humidity^2 -1.99*10^-6*farenheit_temp^2*relative_humidity^2 )°F
 end
 function extract_results(solution::SaunaResults, scenario::SaunaScenario)
-    @show human_exper_temperatures= map(temperature_air -> experienced_temperature(temperature_air, scenario.temperature_floor), solution.temperatures_air)
+    human_exper_temperatures= map(temperature_air -> experienced_temperature(temperature_air, scenario.temperature_floor), solution.temperatures_air)
     ratio_steam_atmosphere = map( solution.pressures_humidity) do pressure_humidity
-        println(pressure_humidity)
         uconvert(Pa, pressure_humidity)/(uconvert(Pa, scenario.atmospheric_pressure))
     end
     apparent_temperatures = map((temperature, humidity) -> apparent_temperature(temperature, humidity),human_exper_temperatures, ratio_steam_atmosphere)
