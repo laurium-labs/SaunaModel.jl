@@ -2,7 +2,7 @@
 Provides an estimate of the raidance power transmitted to a stove in a small fire.
 """
 function radiance_exchange(temperature_1::Temperature, temperature_2::Temperature, area::Area, emissivity=1)::Power
-    emissivity * uconvert(W, σ * (uconvert(K,temperature_1) - uconvert(K, temperature_2))^4 * uconvert(m^2, area) )
+    emissivity * uconvert(W, σ * (uconvert(K,temperature_1)^4 - uconvert(K, temperature_2)^4) * uconvert(m^2, area) )
 end
 function convection_exchange(temperature_1::Temperature, temperature_2::Temperature, area::Area, convective_coeff )::Power
     uconvert(W,convective_coeff*(uconvert(K,temperature_1)-uconvert(K,temperature_2)) * area)
