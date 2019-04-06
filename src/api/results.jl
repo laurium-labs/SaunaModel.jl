@@ -21,14 +21,14 @@ function extract_results(solution::SaunaResults, scenario::SaunaScenario)
     ratio_steam_atmosphere = map( solution.pressures_humidity) do pressure_humidity
         uconvert(Pa, pressure_humidity)/(uconvert(Pa, scenario.atmospheric_pressure))
     end
-    apparent_temperatures = map((temperature, humidity) -> apparent_temperature(temperature, humidity),human_exper_temperatures, ratio_steam_atmosphere)
-    return (solution.times, human_exper_temperatures, ratio_steam_atmosphere, apparent_temperatures )
+    human_heat_input = _heat_into_humans(solution, scenario)
+    return (solution.times, human_exper_temperatures, ratio_steam_atmosphere, human_heat_input )
 end
 
 function strip_units_results(results)
-    time, human_exper_temperatures, ratio_steam_atmosphere, real_feel = results
+    time, human_exper_temperatures, ratio_steam_atmosphere, human_heat_input = results
     stripped_times = map(time -> uconvert(s,time)|>ustrip, time)
     stripped_human_exper_temperatures = map(temperature -> uconvert(°F, temperature)|>ustrip, human_exper_temperatures)
-    stripped_real_feel = map(temperature -> uconvert(°F, temperature)|>ustrip, real_feel)
-    return (stripped_times, stripped_human_exper_temperatures, ratio_steam_atmosphere, stripped_real_feel)
+    stripped_human_heat_input = map(power -> uconvert(W, power)|>ustrip, human_heat_input)
+    return (stripped_times, stripped_human_exper_temperatures, ratio_steam_atmosphere, stripped_human_heat_input)
 end

@@ -1,5 +1,5 @@
 function experienced_temperature(mean_air_temperature::Temperature,temperature_floor::Temperature )::Temperature 
-    uconvert(K, temperature_floor)+(uconvert(K, mean_air_temperature)-uconvert(K, temperature_floor))*1.5
+    uconvert(K, temperature_floor)+(uconvert(K, mean_air_temperature)-uconvert(K, temperature_floor))*1.25
 end
 function steam_throwing(u,p,t)
     experienced_temperature(u[2]K, p.temperature_floor)> p.steam_throwing.air_temperature_start_throwing ? uconvert(s^-1,p.steam_throwing.rate)|>ustrip : 0.0

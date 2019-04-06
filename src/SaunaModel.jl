@@ -1,8 +1,8 @@
 module SaunaModel
 
 using DifferentialEquations 
-using Unitful:s, minute,°F, °C, inch, Length, Area, Volume, W, m,Energy, kW, kJ, J, uconvert, ustrip, Power, K, °C, 
-        Temperature, σ, Time, Frequency, hr, Pressure, Pa, atm, kg, g, R, Mass, Quantity, mol
+using Unitful:s, minute,°F, °C, inch, Length, Area, Volume, W, cm, m,Energy, kW, kJ, J, uconvert, ustrip, Power, K, °C, 
+        Temperature, σ, Time, Frequency, hr, Pressure,kPa, Pa, atm, kg, g, R, Mass, Quantity, mol
 using JSON
  
 include("types.jl")
