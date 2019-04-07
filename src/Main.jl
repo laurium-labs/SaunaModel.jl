@@ -1,13 +1,7 @@
 module Main
-import JSON
-
+using SaunaModel:json_api
 Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
-    j = JSON.parse(ARGS[1])
-    time = [1,2,3,4]
-    temperature = [j["room_volume"] * .25, j["room_volume"]* .25, j["room_volume"]* .25, j["room_volume"]* .25]
-    humidity = [j["stove_volume"] * .75, j["stove_volume"]* .75, j["stove_volume"]* .75, j["stove_volume"]* .75]
-    result = Dict("time" => time, "temperature" => temperature, "humidity" => humidity)
-    println(JSON.json(result))
+    println(json_api(ARGS[1]))
     return 0
 end
 

@@ -1,5 +1,8 @@
+function experienced_temperature(mean_air_temperature::Temperature,temperature_floor::Temperature )::Temperature 
+    uconvert(K, temperature_floor)+(uconvert(K, mean_air_temperature)-uconvert(K, temperature_floor))*1.25
+end
 function steam_throwing(u,p,t)
-    uconvert(K, p.temperature_floor)+(u[2]K-uconvert(K, p.temperature_floor))*1.5 > p.steam_throwing.air_temperature_start_throwing ? uconvert(s^-1,p.steam_throwing.rate)|>ustrip : 0.0
+    experienced_temperature(u[2]K, p.temperature_floor)> p.steam_throwing.air_temperature_start_throwing ? uconvert(s^-1,p.steam_throwing.rate)|>ustrip : 0.0
 end
 function solve_sauna(scenario::SaunaScenario )::SaunaResults
     stripped_stove_temperature = uconvert(K,scenario.initial_temperature_stove)|>ustrip
@@ -36,7 +39,6 @@ end
 integrator is from DifferentialEquations
 """
 function throw_steam!(integrator)
-    println("Steam thrown!")
     mass_thrown = uconvert(kg,integrator.p.steam_throwing.scoop_size)|>ustrip
     new_mass_of_water = integrator.u[5] + mass_thrown
     integrator.u[6] = (integrator.u[6] * integrator.u[5] + ustrip(uconvert(K, integrator.p.steam_throwing.water_thrown_temperature)) * mass_thrown)/new_mass_of_water
