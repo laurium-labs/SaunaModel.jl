@@ -1,3 +1,4 @@
+include("../apparent_temperatures.jl")
 """
 Empirical estimate of vapor pressure: https://en.wikipedia.org/wiki/Vapour_pressure_of_water
 """
