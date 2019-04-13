@@ -1,5 +1,6 @@
 include("default_components.jl")
 include("results.jl")
+using Unitful
 function apply_json_mutations(object::Any, json::Dict)
     # This function recreates `object` with any mutations from `json`
      new_fields = map(fieldnames(typeof(object))) do field
