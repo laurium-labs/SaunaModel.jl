@@ -17,6 +17,22 @@ function apply_json_mutations(object::Any, json::Dict)
     return typeof(object)(new_fields...)
 end
 
+function get_json_description(object::Any)
+    json = Dict()
+    fields = fieldnames(typeof(object))
+    for field in fields
+        orig_field_value = getfield(object, field)
+        if typeof(orig_field_value) <: Unitful.AbstractQuantity
+            string_rep = string(orig_field_value)
+            unit_string = string_rep[findfirst(isequal(' '), string_rep) + 1: end]
+            json[string(field)] = Dict("val" => orig_field_value.val, "unit" => unit_string)
+        else
+            json[string(field)] = get_json_description(orig_field_value)
+        end
+    end
+    return json
+end
+
 function dictionary_api(dictionary_sauna_specification::Dict)::Dict
     scenario = apply_json_mutations(SaunaDefaults.default_scenario, dictionary_sauna_specification)
     time, experinced_temperature, relative_humidity, human_heat_input = strip_units_results(extract_results(solve_sauna(scenario), scenario))
@@ -25,4 +41,8 @@ end
 
 function json_api(json_input::AbstractString)::String
     return JSON.json(dictionary_api(JSON.parse(json_input)))
+end
+
+function get_default_scenario_json()::String
+    return JSON.json(get_json_description(SaunaDefaults.default_scenario))
 end
