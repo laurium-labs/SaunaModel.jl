@@ -29,22 +29,24 @@ One way to make the system simpiler to deal with is to assume a constant value f
 Here is a short review of heat transfer. There are only a few equations that drive this process. For all equations below $A$ is area, $L$ is length, $T$ is temperature.
 #### Conduction
 Conduction is when heat moves through physical contact with objects. In the sauna, the main conductive aspect is the walls conducting temperature to the outside. Effective insulation will greatly reduce this mode of heat transfer.
-$$k\frac{(T_{hot}-T_{cold})*A}{L}$$
+$$k\frac{(T_{hot}-T_{cold})A}{L}$$
 where $k$ is the conduction coefficient, which is fairly straight forward to measure for many materials. To learn all you probably need to know about thermal conduction consult [Wikipedia.](https://en.wikipedia.org/wiki/Thermal_conduction)
 
 #### Convection
 Convection is the mode of heat transfer due to fluid flows. This mode of heat transfer is extremely common in a sauna. The heat transfer from a burning hot steam to your shoulders is one. Heat transfer from hot gas rising off the fire to the stove is another.
-$$h(T_{hot}-T_{cold})*A$$
+$$h(T_{hot}-T_{cold})A$$
 where $h$ is the convective coefficient. Convective coefficients can be approximated through a fairly complex process of determining Reynold's numbers and Nusselt's numbers. I used reference numbers to save time. To learn all you probably need to know about thermal convection consult [Wikipedia.](https://en.wikipedia.org/wiki/Convective_heat_transfer)
 
-### Radiation
+#### Radiation
 Radiation is the mode of heat transfer due to electromagnetic radiation. Heat moving like light, instantaneously, through the atmosphere. If you feel the heat coming off of something hot, it is probably radiation. The burning sensation in your shins from an oversized stove (cough, Benda's, cough) is from radiation.
 $$\sigma\epsilon A (T_{hot}^4 - T_{cold}^4)$$
 where $\sigma$ is the Stefan–Boltzmann constant (some universal constant), $\epsilon$ is the emissivity (black top has a high emissivity, white shirts have a lower one). I assumed that $\epsilon=1$ for the purposes of this model. [Wikipedia.](https://en.wikipedia.org/wiki/Thermal_radiation)
 
-### Advection (mass transfer)
+#### Advection (mass transfer)
 Heat is also transfered when hot air leaves the room and cold air flows in.
+### Differential Equations
+
 ## Humans in the Sauna
 
 ## Commentary on development
-I
+I developed the model in Julia for a couple of reasons. First, it is my daily driver language, it is what I use all the time. It also offers some excellent unit and differential equations packages. 
