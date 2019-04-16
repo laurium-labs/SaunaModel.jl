@@ -43,10 +43,24 @@ $$\sigma\epsilon A (T_{hot}^4 - T_{cold}^4)$$
 where $\sigma$ is the Stefan–Boltzmann constant (some universal constant), $\epsilon$ is the emissivity (black top has a high emissivity, white shirts have a lower one). I assumed that $\epsilon=1$ for the purposes of this model. [Wikipedia.](https://en.wikipedia.org/wiki/Thermal_radiation)
 
 #### Advection (mass transfer)
-Heat is also transfered when hot air leaves the room and cold air flows in.
+Heat is also transfered when hot air leaves the room and cold air flows in. Since our sauna is not leak proof, a certain amount of the air in the room turns over on every time increment. This  rate is associated with the difference in air temperature. [Nature](https://www.nature.com/articles/7500229) had a fairly solid article on the turnover rate for a house, and I adjusted (upwards) it for the surface area to volume ratio of the sauna under consideration. All smaller rooms have a larger surface area to volume ratio compared to larger rooms.
+#### Phase change
+Throwing water on the stove causes heat to convect into the water on the stove rapidly turning it into steam. This phase change heats the air and stings your ears. Since this is also a mass transfer, it is also advection. The steam coming off the stove is assumed to be 212°F as there will be minimal heating of the steam after it boils.
 ### Differential Equations
+There are 6 differential equations modelling sauna dynamics. 4 of them are temperature (stove, air, room, thrown water), 1 of them is room humidity, and 1 is the mass of unboiled water that was thrown on the stove. There is also a jump step, which causes steam to be thrown. The mass of water suddenly increases on the stove, and rebalances the average temperature of the thrown water.
+<center>
+
+|Interaction| Fire | Stove | Air | Room | Thrown water | Human |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+|Fire | - | Convection and <br> Radiation | - | - | - | - |
+|Stove | - | - | Convection | Radiation | Convection | Radiation |
+|Air | - | - |  | Convection | - | Convection <br> Evaporation |
+|Room | - | - |  | Convection | - | Radiation |
+
+</center>
+
 
 ## Humans in the Sauna
 
 ## Commentary on development
-I developed the model in Julia for a couple of reasons. First, it is my daily driver language, it is what I use all the time. It also offers some excellent unit and differential equations packages. 
+I developed the model in Julia for a couple of reasons. First, it is my daily driver language, it is what I use all the time. It also offers some excellent unit and differential equations packages. I used a functional approach as far as possible, avoiding side effects other than what is dictated by the Differential Equations package. This should make the code base easier to maintain.
