@@ -36,8 +36,7 @@ end
 
 function dictionary_api(dictionary_sauna_specification::Dict)::Dict
     scenario = apply_json_mutations(SaunaDefaults.default_scenario, dictionary_sauna_specification)
-    time, experinced_temperature, relative_humidity, human_heat_input = strip_units_results(extract_results(solve_sauna(scenario), scenario))
-    result_dict = Dict("time" => time, "human_exper_temperature" => experinced_temperature, "relative_humidity" => relative_humidity, "watt_into_human" => human_heat_input)
+    extract_results(solve_sauna(scenario), scenario)
 end
 
 function json_api(json_input::AbstractString)::String

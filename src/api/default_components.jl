@@ -1,7 +1,7 @@
 module SaunaDefaults
 using SaunaModel:Stove, Room, SaunaNoWater, SaunaScenario, SteamThrowing
 using Unitful:s, minute,°F, inch, cm, ft, Length, Area, Volume, W, m,Energy, kW, kJ, J, uconvert, ustrip, Power, K, °C, 
-        Temperature, σ, Time, Frequency, hr, Pressure, Pa, atm, kg, lb, g, R, Mass, Quantity, mol
+        Temperature, σ, Time, Frequency, hr, Pressure, Pa, atm, kg, lb, g, R, Mass, Quantity, mol, NoDims
 const default_stove = let
     #http://saunawoodstove.com/
     exterior_surface_area_stove = 16inch*25inch*2 + 18inch*25inch*2 + 18inch*16inch*2
@@ -68,9 +68,9 @@ const default_sauna = let
 end
 const default_scenario = let
     start_time = 0.0s
-    end_time = 1.2hr
+    end_time = 2.0hr
     start_temperature = 100.0°F
-    max_temperature = 1200.0°F
+    max_temperature = 1000.0°F
     fire_temperature_curve(time) =  fire_temperature(time,max_temperature, start_temperature )
     start_radius = .04m
     max_radius = .3m
