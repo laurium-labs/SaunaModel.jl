@@ -1,9 +1,13 @@
 module SaunaDefaults
-using SaunaModel:Stove, Room, SaunaNoWater, SaunaScenario, SteamThrowing
+using SaunaModel:Stove, Room, SaunaNoWater, SaunaScenario, SteamThrowing, Fire
 using Unitful:s, minute,°F, inch, cm, ft, Length, Area, Volume, W, m,Energy, kW, kJ, J, uconvert, ustrip, Power, K, °C, 
         Temperature, σ, Time, Frequency, hr, Pressure, Pa, atm, kg, lb, g, R, Mass, Quantity, mol, NoDims
 const default_stove = let
     #http://saunawoodstove.com/
+    width = 16inch
+    depth = 18inch
+    height = 25inch
+    thickness_stove_wall = .25inch
     exterior_surface_area_stove = 16inch*25inch*2 + 18inch*25inch*2 + 18inch*16inch*2
     stove_mass_estimate = uconvert(kg, 7.83g/cm^3*.25inch*(exterior_surface_area_stove ))
     rock_mass_estimate = uconvert(kg, 2.691*g/cm^3 *18inch*16inch*4inch)
@@ -17,9 +21,11 @@ const default_stove = let
     #https://www.engineeringtoolbox.com/convective-heat-transfer-d_430.html
     surface_area_thrown_water = 1m^2
     convection_coeff_stove_water = 20W/(m^2*K)
-    Stove(stove_mass_estimate, 
-        rock_mass_estimate, 
-        exterior_surface_area_stove, 
+    Stove(
+        width, 
+        depth,
+        height,
+        thickness_stove_wall,
         length_pipe,
         radius_pipe,
         rock_specific_heat, 
@@ -41,10 +47,10 @@ const default_room = let
     conduction_coeff_insulation = 0.04W/(m*K)
     convection_coeff = 7.9W/(m^2*K)
     specific_heat_cedar = 0.48kJ/(kg*K)
-    Room(total_mass, 
-    height, 
+    Room(height, 
     width, 
     depth, 
+    thickness_walls,
     thickness_insulation, 
     conduction_coeff_insulation,
     convection_coeff,
@@ -71,17 +77,16 @@ const default_scenario = let
     end_time = 2.0hr
     start_temperature = 100.0°F
     max_temperature = 1000.0°F
-    fire_temperature_curve(time) =  fire_temperature(time,max_temperature, start_temperature )
-    start_radius = .04m
+    start_radius = .4cm
     max_radius = .3m
-    fire_radius_curve(time) =  fire_radius(time, max_radius, start_radius)
+    fire = Fire(start_temperature,max_temperature,start_radius,max_radius)
     water_thrown_temperature = 40.0°F
     temperature_outside = 50.0°F
     scoop_size = 1.0lb
     pressure_outside = 1.0atm
     humidity_outside = 1212.0Pa*.3 #30% humidity
     temperature_floor = 50.0°F   
-    initial_temperature = uconvert(K,51°F)
+    initial_temperature = 51°F
     water_throwing = SteamThrowing(150.0°F, water_thrown_temperature, scoop_size, (1.0/60)s^-1  )
     SaunaScenario(
         default_sauna,
@@ -90,8 +95,7 @@ const default_scenario = let
         initial_temperature,
         initial_temperature,
         initial_temperature,
-        fire_temperature_curve,
-        fire_radius_curve,
+        fire,
         temperature_outside,
         humidity_outside,
         pressure_outside,

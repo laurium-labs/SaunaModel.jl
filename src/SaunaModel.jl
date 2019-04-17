@@ -14,6 +14,7 @@ include("api/api.jl")
 
 volume(room::Room)::Volume = room.height*room.width*room.depth
 outer_surface_area(room::Room)::Area = room.height*room.width*2 + room.height*room.depth*2 + room.height*room.width
+outer_surface_area(stove::Stove)::Area = 2*(stove.width*stove.height + stove.width*stove.depth + stove.depth*stove.height)
 floor_surface_area(room::Room)::Area = room.height*room.width
 inner_surface_area(stove::Stove)::Area = stove.radius_pipe*2*π *stove.length_pipe
 
@@ -23,14 +24,25 @@ end
 function unitize_variables(u::Vector)
     (u[1]K, u[2]K, u[3]K, u[4]Pa, u[5]kg, u[6]K)
 end
-function build_sauna_model(du, u, scenario, time)
+function fire_temperature(fire::Fire, time::Time)::Temperature
+    start_temperature = uconvert(K,fire.initial_temperature)
+    max_temperature = uconvert(K, fire.final_temperature)
+    uconvert(K,start_temperature+(1-exp(-uconvert(s/s,time/20minute)|>ustrip))*(max_temperature-start_temperature))
+end
+function fire_radius(fire::Fire, time::Time )::Length
+    start_radius = uconvert(m, fire.initial_radius)
+    max_radius = uconvert(m, fire.final_radius)
+    uconvert(m,start_radius+(1-exp(-time/20minute))*(max_radius-start_radius))
+end
+function build_sauna_model(du, u, scenario, raw_time)
     sauna = scenario.sauna
+    time = (raw_time)s
     temperature_stove, temperature_air, temperature_room , humidity_air, thrown_water_mass, temperature_thrown_water = unitize_variables(u)
 
-    fire_stove_heat_exchange = radiance_exchange(scenario.fire_curve((time)s), temperature_stove, scenario.radius_fire((time)s)^2 *2 * π ) + 
-                    convection_exchange(scenario.fire_curve((time)s), temperature_stove,inner_surface_area(sauna.stove), sauna.stove.convection_coeff)
-    stove_room_heat_exchange = radiance_exchange(temperature_stove, temperature_room, sauna.stove.exterior_surface_area*sauna.sauna_room_view_factor)
-    stove_air_heat_exchange = convection_exchange(temperature_stove, temperature_room, sauna.stove.exterior_surface_area, sauna.stove.convection_coeff )
+    fire_stove_heat_exchange = radiance_exchange(fire_temperature(scenario.fire, time), temperature_stove, fire_radius(scenario.fire, time)^2 *2 * π ) + 
+                    convection_exchange(fire_temperature(scenario.fire, time), temperature_stove,inner_surface_area(sauna.stove), sauna.stove.convection_coeff)
+    stove_room_heat_exchange = radiance_exchange(temperature_stove, temperature_room, outer_surface_area(sauna.stove)*sauna.sauna_room_view_factor)
+    stove_air_heat_exchange = convection_exchange(temperature_stove, temperature_room, outer_surface_area(sauna.stove), sauna.stove.convection_coeff )
     air_room_heat_exchange = convection_exchange(temperature_air, temperature_room, outer_surface_area(sauna.room), sauna.room.convection_coeff )
     air_floor_heat_exchange = convection_exchange(temperature_air, scenario.temperature_floor, floor_surface_area(sauna.room), sauna.room.convection_coeff )
     room_floor_heat_exchange = radiance_exchange(temperature_room, scenario.temperature_floor, .9*sauna.room.width*sauna.room.depth)
@@ -38,7 +50,7 @@ function build_sauna_model(du, u, scenario, time)
     room_outside_conduction = conduction_exchange_wall(temperature_room, uconvert(K,scenario.temperature_outside), sauna.room)
     stove_water_heat = thrown_water_mass > 0.0kg ? convection_exchange(temperature_stove,temperature_thrown_water, sauna.stove.surface_area_thrown_water, sauna.stove.convection_coeff_water_stone ) : 0.0W
     heat_capacity_thrown_water = thrown_water_mass * specific_heat_water
-    heat_into_water = temperature_thrown_water>=100°C ? stove_water_heat : 0.0W
+    heat_into_water = temperature_thrown_water >= 100°C ? stove_water_heat : 0.0W
     boiled_water_mol_rate = uconvert(mol/s, heat_into_water/enthalpy_vaporization_water)
     steam_heat_into_air = (100°C - temperature_air ) * boiled_water_mol_rate * steam_heat_capacity
     humidity_pressure_bump = pressure_bump_rate_boiled_water(boiled_water_mol_rate, temperature_air, sauna.room)
@@ -51,7 +63,7 @@ function build_sauna_model(du, u, scenario, time)
     du[3] = uconvert(K/s, (stove_room_heat_exchange + air_room_heat_exchange - room_outside_conduction -room_floor_heat_exchange) / heat_capacity(sauna.room))|>ustrip
     du[4] = uconvert(Pa/s, -(humidity_air-scenario.humidity_outside) * air_turnover_portion + humidity_pressure_bump)|>ustrip
     du[5] = uconvert(kg/s, -boiled_water_mol_rate*molar_mass_water)|>ustrip
-    du[6] = uconvert(K/s, temperature_thrown_water<100°C && thrown_water_mass>0kg ? stove_water_heat/heat_capacity_thrown_water : 0K/s )|>ustrip
+    du[6] = uconvert(K/s, temperature_thrown_water<100.1°C && thrown_water_mass>0kg ? stove_water_heat/heat_capacity_thrown_water : 0K/s )|>ustrip
     nothing
 end
 

@@ -54,8 +54,8 @@ There are 6 differential equations modelling sauna dynamics. 4 of them are tempe
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 |Fire | - | Convection and <br> Radiation | - | - | - | - |
 |Stove | - | - | Convection | Radiation | Convection | Radiation |
-|Air | - | - |  | Convection | - | Convection <br> Evaporation |
-|Room | - | - |  | Convection | - | Radiation |
+|Air | - | - |  | Convection | Phase Change | Convection <br> Phase Change |
+|Room | - | - |  | - | - | Radiation |
 
 </center>
 

@@ -10,9 +10,12 @@ end
 function conduction_exchange_wall(temperature_room::Temperature, temperature_outside::Temperature, room::Room)::Power
     uconvert(W, (uconvert(K,temperature_room) - uconvert(K, temperature_outside))*outer_surface_area(room)/room.thickness_insulation*room.conduction_coeff)
 end
-heat_capacity(room::Room) = room.mass * room.specific_heat
+room_mass(room::Room)::Mass = 380kg/m^3*(room.width*room.depth+room.height*room.width*2 +room.height*room.depth*2)*room.thickness_wall
+heat_capacity(room::Room) = room_mass(room) * room.specific_heat
+stove_mass(stove::Stove)::Mass = uconvert(kg, 7.83g/cm^3*stove.thickness_stove_wall*(outer_surface_area(stove) ))
+rock_mass(stove::Stove)::Mass = uconvert(kg, 2.691*g/cm^3 *stove.width*stove.depth*.25*stove.height)
 function heat_capacity(stove::Stove)
-    stove.mass * stove.specific_heat + stove.rock_mass*stove.rock_specific_heat
+    stove_mass(stove) * stove.specific_heat + rock_mass(stove)*stove.rock_specific_heat
 end
 const steam_heat_capacity = 28.03J/(mol*K)
 const dry_air_heat_capacity = 20.7643J/(mol*K)
