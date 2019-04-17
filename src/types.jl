@@ -1,9 +1,10 @@
 abstract type AbstractSauna end
 
 struct Stove 
-    mass::Mass
-    rock_mass::Mass
-    exterior_surface_area::Area
+    width::Length
+    depth::Length
+    height::Length
+    thickness_stove_wall::Length
     length_pipe::Length
     radius_pipe::Length
     rock_specific_heat
@@ -13,10 +14,10 @@ struct Stove
     convection_coeff_water_stone
 end
 struct Room 
-    mass::Mass
     height::Length
     width::Length
     depth::Length 
+    thickness_wall::Length
     thickness_insulation::Length 
     conduction_coeff
     convection_coeff
@@ -39,6 +40,12 @@ struct SteamThrowing
     scoop_size::Mass
     rate::Frequency
 end
+struct Fire 
+    initial_temperature::Temperature
+    final_temperature::Temperature
+    initial_radius::Length
+    final_radius::Length
+end 
 struct SaunaScenario
     sauna::SaunaNoWater
     start_time::Time 
@@ -46,8 +53,7 @@ struct SaunaScenario
     initial_temperature_stove::Temperature
     initial_temperature_air::Temperature
     initial_temperature_room::Temperature
-    fire_curve::Function
-    radius_fire::Function
+    fire::Fire
     temperature_outside::Temperature
     humidity_outside::Pressure
     atmospheric_pressure::Pressure

@@ -78,7 +78,7 @@ function compute_effective_convection_coeff(pressure_Δ, temperature_air::Temper
     return Nu/significant_diameter*k
 end
 function _heat_into_humans(temperature_air::Temperature, temperature_room::Temperature, pressure_humidity::Pressure, temperature_stove::Temperature, pressure_Δ, scenario::SaunaScenario)::Power
-    stove_vf = scenario.sauna.stove.exterior_surface_area/4/outer_surface_area(scenario.sauna.room)
+    stove_vf = outer_surface_area(scenario.sauna.stove)/4/outer_surface_area(scenario.sauna.room)
     radiation_with_room = radiance_exchange(temperature_air, body_temperature, body_surface_area*(1-stove_vf)*view_factor_external_body_naked)
     radiation_with_stove = radiance_exchange(temperature_stove, body_temperature, body_surface_area*stove_vf*view_factor_external_body_naked)
     effective_body_convective_coeff = compute_effective_convection_coeff(pressure_Δ,temperature_air,pressure_humidity, scenario)

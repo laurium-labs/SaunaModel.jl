@@ -26,21 +26,21 @@ One way to make the system simpiler to deal with is to assume a constant value f
 - The fire grows to a maximum temperature of 1200°F and a radius of .3 meters
 
 ### Heat transfer equations
-Here is a short review of heat transfer. There are only a few equations that drive this process. For all equations below <img src="/tex/53d147e7f3fe6e47ee05b88b166bd3f6.svg?invert_in_darkmode&sanitize=true" align=middle width=12.32879834999999pt height=22.465723500000017pt/> is area, <img src="/tex/ddcb483302ed36a59286424aa5e0be17.svg?invert_in_darkmode&sanitize=true" align=middle width=11.18724254999999pt height=22.465723500000017pt/> is length, <img src="/tex/2f118ee06d05f3c2d98361d9c30e38ce.svg?invert_in_darkmode&sanitize=true" align=middle width=11.889314249999991pt height=22.465723500000017pt/> is temperature.
+Here is a short review of heat transfer. There are only a few equations that drive this process. For all equations below $A$ is area, $L$ is length, $T$ is temperature.
 #### Conduction
 Conduction is when heat moves through physical contact with objects. In the sauna, the main conductive aspect is the walls conducting temperature to the outside. Effective insulation will greatly reduce this mode of heat transfer.
-<p align="center"><img src="/tex/eec24de8f2f19d3dc7e84014aec0f1d6.svg?invert_in_darkmode&sanitize=true" align=middle width=119.69004134999999pt height=34.7253258pt/></p>
-where <img src="/tex/63bb9849783d01d91403bc9a5fea12a2.svg?invert_in_darkmode&sanitize=true" align=middle width=9.075367949999992pt height=22.831056599999986pt/> is the conduction coefficient, which is fairly straight forward to measure for many materials. To learn all you probably need to know about thermal conduction consult [Wikipedia.](https://en.wikipedia.org/wiki/Thermal_conduction)
+$$k\frac{(T_{hot}-T_{cold})A}{L}$$
+where $k$ is the conduction coefficient, which is fairly straight forward to measure for many materials. To learn all you probably need to know about thermal conduction consult [Wikipedia.](https://en.wikipedia.org/wiki/Thermal_conduction)
 
 #### Convection
 Convection is the mode of heat transfer due to fluid flows. This mode of heat transfer is extremely common in a sauna. The heat transfer from a burning hot steam to your shoulders is one. Heat transfer from hot gas rising off the fire to the stove is another.
-<p align="center"><img src="/tex/0f64a80e50d869dc0cfbd2eadaca9855.svg?invert_in_darkmode&sanitize=true" align=middle width=118.11319574999999pt height=16.438356pt/></p>
-where <img src="/tex/2ad9d098b937e46f9f58968551adac57.svg?invert_in_darkmode&sanitize=true" align=middle width=9.47111549999999pt height=22.831056599999986pt/> is the convective coefficient. Convective coefficients can be approximated through a fairly complex process of determining Reynold's numbers and Nusselt's numbers. I used reference numbers to save time. To learn all you probably need to know about thermal convection consult [Wikipedia.](https://en.wikipedia.org/wiki/Convective_heat_transfer)
+$$h(T_{hot}-T_{cold})A$$
+where $h$ is the convective coefficient. Convective coefficients can be approximated through a fairly complex process of determining Reynold's numbers and Nusselt's numbers. I used reference numbers to save time. To learn all you probably need to know about thermal convection consult [Wikipedia.](https://en.wikipedia.org/wiki/Convective_heat_transfer)
 
 #### Radiation
 Radiation is the mode of heat transfer due to electromagnetic radiation. Heat moving like light, instantaneously, through the atmosphere. If you feel the heat coming off of something hot, it is probably radiation. The burning sensation in your shins from an oversized stove (cough, Benda's, cough) is from radiation.
-<p align="center"><img src="/tex/c2450948984f2451cba46b546ad61778.svg?invert_in_darkmode&sanitize=true" align=middle width=125.2973535pt height=18.312383099999998pt/></p>
-where <img src="/tex/8cda31ed38c6d59d14ebefa440099572.svg?invert_in_darkmode&sanitize=true" align=middle width=9.98290094999999pt height=14.15524440000002pt/> is the Stefan–Boltzmann constant (some universal constant), <img src="/tex/7ccca27b5ccc533a2dd72dc6fa28ed84.svg?invert_in_darkmode&sanitize=true" align=middle width=6.672392099999992pt height=14.15524440000002pt/> is the emissivity (black top has a high emissivity, white shirts have a lower one). I assumed that <img src="/tex/c2101b156b66aec18d423619f4e227b5.svg?invert_in_darkmode&sanitize=true" align=middle width=36.80923124999999pt height=21.18721440000001pt/> for the purposes of this model. [Wikipedia.](https://en.wikipedia.org/wiki/Thermal_radiation)
+$$\sigma\epsilon A (T_{hot}^4 - T_{cold}^4)$$
+where $\sigma$ is the Stefan–Boltzmann constant (some universal constant), $\epsilon$ is the emissivity (black top has a high emissivity, white shirts have a lower one). I assumed that $\epsilon=1$ for the purposes of this model. [Wikipedia.](https://en.wikipedia.org/wiki/Thermal_radiation)
 
 #### Advection (mass transfer)
 Heat is also transfered when hot air leaves the room and cold air flows in. Since our sauna is not leak proof, a certain amount of the air in the room turns over on every time increment. This  rate is associated with the difference in air temperature. [Nature](https://www.nature.com/articles/7500229) had a fairly solid article on the turnover rate for a house, and I adjusted (upwards) it for the surface area to volume ratio of the sauna under consideration. All smaller rooms have a larger surface area to volume ratio compared to larger rooms.
