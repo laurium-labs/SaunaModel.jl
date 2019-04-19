@@ -23,7 +23,7 @@ function extract_results(solution::SaunaResults, scenario::SaunaScenario)
     ratio_steam_atmosphere = map( solution.pressures_humidity) do pressure_humidity
         uconvert(Pa, pressure_humidity)/(uconvert(Pa, scenario.atmospheric_pressure))
     end
-    human_heat_input = _heat_into_humans(solution, scenario)
+    human_heat_input = heat_into_humans(solution, scenario)
     temperature_core, times_temperature_core = find_human_temperature(human_heat_input, human_exper_temperatures, solution.times, scenario.steam_throwing.air_temperature_start_throwing)
     results =  (solution.times, human_exper_temperatures, ratio_steam_atmosphere, human_heat_input, temperature_core, times_temperature_core )
     

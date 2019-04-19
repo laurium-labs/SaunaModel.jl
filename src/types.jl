@@ -1,5 +1,8 @@
 abstract type AbstractSauna end
 
+"""
+A stove can be described by its dimensions and specific heats. The stove is assumed to be made out of steel.
+"""
 struct Stove 
     width::Length
     depth::Length
@@ -13,6 +16,9 @@ struct Stove
     surface_area_thrown_water::Area
     convection_coeff_water_stone
 end
+"""
+A room is described by its dimensions, heat transfer coefficients, and specific heat. A density is assumed to compute room mass.
+"""
 struct Room 
     height::Length
     width::Length
@@ -24,28 +30,34 @@ struct Room
     specific_heat
 end
 """
-fire_temperature is the average temperature of the fire
-room_mass is the weight of wood and other sundries being heated with the sauna, and in direct thermal exchange
-https://www.engineersedge.com/heat_transfer/convective_heat_transfer_coefficients__13378.htm
-
+A sauna consists of a stove and room description, as well as a view factor of the room itself from the sauna, which is an estimate of how much of the stoves area is exposed to the room.
 """
 struct SaunaNoWater <:AbstractSauna
     stove::Stove 
     room::Room
     sauna_room_view_factor::Real
 end
+"""
+Steam throwing describes how steam is thrown in a sauna. A temperature to start throwing steam must be selected in order to know when someone would enter the sauna.
+"""
 struct SteamThrowing
     air_temperature_start_throwing::Temperature
     water_thrown_temperature::Temperature
     scoop_size::Mass
     rate::Frequency
 end
+"""
+The fire is the driving heat source of the sauna system. A sigmoid heating function is used to drive the fire temperature up over about a 20 minute period
+"""
 struct Fire 
     initial_temperature::Temperature
     final_temperature::Temperature
     initial_radius::Length
     final_radius::Length
 end 
+"""
+The sauna scenario brings many of the components together, as well as initial and boudnary conditions.
+"""
 struct SaunaScenario
     sauna::SaunaNoWater
     start_time::Time 
@@ -60,7 +72,9 @@ struct SaunaScenario
     temperature_floor::Temperature
     steam_throwing::SteamThrowing
 end
-
+"""
+Sauna results store the state of the system at each time step. Temperatures of the stove, air, room, and water on stove are tracked as well as room humidity and mass of water on stove.
+"""
 struct SaunaResults
     times::Vector{<:Time}
     temperatures_stove::Vector{<:Temperature}

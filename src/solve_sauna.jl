@@ -1,9 +1,17 @@
 function experienced_temperature(mean_air_temperature::Temperature,temperature_floor::Temperature )::Temperature 
     uconvert(K, temperature_floor)+(uconvert(K, mean_air_temperature)-uconvert(K, temperature_floor))*1.25
 end
+"""
+`steam_throwing(u,p,t)` u, p, and t are inputs from the Differential Equations solver. u is the state, p is the solution 
+paramenters, and t is the time. 
+The steam throwing rate is determined by if the experinced temperature is higher than the cutoff to start taking steam. 
+"""
 function steam_throwing(u,p,t)
     experienced_temperature(u[2]K, p.temperature_floor)> p.steam_throwing.air_temperature_start_throwing ? uconvert(s^-1,p.steam_throwing.rate)|>ustrip : 0.0
 end
+"""
+This function sets up the differential equation solvers, including the jump solver, runs the solver, then maps units back onto the results and returns a SaunaResults
+"""
 function solve_sauna(scenario::SaunaScenario )::SaunaResults
     stripped_stove_temperature = uconvert(K,scenario.initial_temperature_stove)|>ustrip
     stripped_air_temperature = uconvert(K, scenario.initial_temperature_air)|>ustrip
@@ -36,7 +44,8 @@ function solve_sauna(scenario::SaunaScenario )::SaunaResults
     )
 end
 """
-integrator is from DifferentialEquations
+`throw_steam!(integrator)` gets its argument integerator from DifferentialEquations
+It updates the current mass of water that is on the stove, and adjusts the average temperature of water on the stove accordingly.
 """
 function throw_steam!(integrator)
     mass_thrown = uconvert(kg,integrator.p.steam_throwing.scoop_size)|>ustrip

@@ -34,6 +34,11 @@ function fire_radius(fire::Fire, time::Time )::Length
     max_radius = uconvert(m, fire.final_radius)
     uconvert(m,start_radius+(1-exp(-time/20minute))*(max_radius-start_radius))
 end
+"""
+`build_sauna_model(du, u, scenario, raw_time)` describes how the system evolves smoothly through time (not including steam throwing)
+This is fed to the ODESolver of Differential Equations. The first argument is the derivative, and must be updated to match how the system is evolving.
+There are many interactions, driven by radiance, convection, conduction, advection, and phase change.
+"""
 function build_sauna_model(du, u, scenario, raw_time)
     sauna = scenario.sauna
     time = (raw_time)s
@@ -80,4 +85,10 @@ We will believe them that they are twice as efficent as a sauna stove
 """
 fire_steady_state(surface_area_board::Area)::Power = 125000W/m^2 * uconvert(m^2,surface_area_board)*.4
 
+export Stove, Room, SaunaNoWater, SteamThrowing, Fire, SaunaScenario, 
+SaunaResults, solve_sauna, json_api, get_default_scenario_json, 
+build_sauna_model, throw_steam!,steam_throwing,
+compute_effective_convection_coeff,surface_moisture_resistance, 
+evaporation_cooling, skin_moisture_resistance, heat_into_humans,
+conduction_exchange_wall, convection_exchange, radiance_exchange, air_turnover
 end # module
