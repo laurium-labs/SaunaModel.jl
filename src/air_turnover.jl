@@ -1,9 +1,9 @@
 const compared_house_surface_area = 50m^2 + 7m*8m*3 #approximation, three sides open, 50m^2 floors.
 const compared_house_volume = 400m^3 #given
 """
-Diffusion of air:
+`air_turnover(temperature_difference::Temperature, room::Room)::Frequency`
+A house was shown to have a turnover rate of .176 + .0162 ΔT, and estimates of the house surface area and volume could be made. This allows for an estimate of air turnover in a sauna.
 https://www.nature.com/articles/7500229
-A house was shown to have a turnover rate of .176 + .0162 ΔT
 """
 function air_turnover(temperature_difference::Temperature, room::Room)::Frequency
     room_surface_area_to_volume = outer_surface_area(room)/volume(room)

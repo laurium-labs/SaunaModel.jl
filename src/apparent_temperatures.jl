@@ -39,16 +39,27 @@ const air_thermal_conductivity_itp = let
     itp = interpolate((temperatures,), results, Gridded(Linear()))
     extrapolate(itp, Line())
 end 
+"""
+`skin_moisture_resistance(pressure_humidity::Pressure)` takes the air temperature as an argument and returns surface moisture resistance.
+Data is drawn from:
+The Assessment of Sultriness. Part I: A Temperature-Humidity Index Based on Human Physiology and Clothing Science -Steadman
+Table 3
+"""
 function skin_moisture_resistance(temperature_air::Temperature)
     skin_moisture_resistance_itp(uconvert(°C, temperature_air  ))
 end
 """
+`surface_moisture_resistance(pressure_humidity::Pressure)` takes a the humidity as an argument and returns surface moisture resistance.
+Data is drawn from:
 The Assessment of Sultriness. Part I: A Temperature-Humidity Index Based on Human Physiology and Clothing Science -Steadman
 Table 3
 """
 function surface_moisture_resistance(pressure_humidity::Pressure)
     ((199+ 1.6*ustrip(uconvert(kPa,pressure_humidity)))^-1)m^2*kPa/W
 end
+"""
+Evaporative cooling depends on skin and surface resistance to pressure. Skin resistance to pressure drops as temperature rises.
+"""
 function evaporation_cooling(temperature_air::Temperature, pressure_humidity::Pressure)::Power
     skin_resistance = skin_moisture_resistance(temperature_air)
     surface_resistance = surface_moisture_resistance(pressure_humidity)
@@ -67,31 +78,44 @@ function Nu_cylinder(Re::DimensionlessQuantity, Pr::DimensionlessQuantity)::Dime
         return .027*Re^.805*Pr^.3333
     end 
 end
-function compute_effective_convection_coeff(pressure_Δ, temperature_air::Temperature, humidity_air::Pressure, scenario::SaunaScenario)
+"""
+`compute_effective_convection_coeff` estimates a convection coefficent based on the change in humidity, air temperature, humidity, and the overall scenario
+This involves estimating an air speed (based on change in humidity), kinematic viscosity, dynamic viscosity, air thermal conductivity, and air specific heat.
+These are used in turn to estimate a Reynolds number and a Prantl number, which is used with the cylindrical estimate of a Nussult number.
+The Nussult number is used to estimate a convection coefficient.
+"""
+function compute_effective_convection_coeff(pressure_Δ, temperature_air::Temperature, humidity_air::Pressure, atmospheric_pressure::Pressure)
     speed = air_speed_guess_itp(abs(pressure_Δ))
     Re = significant_diameter*speed/kinematic_viscosity_itp(uconvert(°F, temperature_air ))
-    c_p = specific_heat_wet_air(scenario.atmospheric_pressure, humidity_air)
+    c_p = specific_heat_wet_air(atmospheric_pressure, humidity_air)
     μ = dynamic_viscosity_itp(uconvert(°F, temperature_air))
     k = air_thermal_conductivity_itp(uconvert(°C, temperature_air))
     Pr = μ * c_p / k
     Nu = Nu_cylinder(Re,Pr)
     return Nu/significant_diameter*k
 end
-function _heat_into_humans(temperature_air::Temperature, temperature_room::Temperature, pressure_humidity::Pressure, temperature_stove::Temperature, pressure_Δ, scenario::SaunaScenario)::Power
+"""
+`heat_into_humans(temperature_air::Temperature, temperature_room::Temperature, pressure_humidity::Pressure, temperature_stove::Temperature, pressure_Δ, scenario::SaunaScenario)::Power`
+This function estimates heat entering a human from air, rooom, and stove temperatures, as well as humidity and change in humidity.
+Radiation exchange with the room and the stove is computed, as well as convection with the air. A major component is estimating the convection coefficent. 
+Evaporative cooling is also estimated, and deducted from the total heat transfer
+Skin surface temperature is assumed to be the normal core body temperature.
+"""
+function heat_into_humans(temperature_air::Temperature, temperature_room::Temperature, pressure_humidity::Pressure, temperature_stove::Temperature, pressure_Δ, scenario::SaunaScenario)::Power
     stove_vf = outer_surface_area(scenario.sauna.stove)/4/outer_surface_area(scenario.sauna.room)
     radiation_with_room = radiance_exchange(temperature_air, body_temperature, body_surface_area*(1-stove_vf)*view_factor_external_body_naked)
     radiation_with_stove = radiance_exchange(temperature_stove, body_temperature, body_surface_area*stove_vf*view_factor_external_body_naked)
-    effective_body_convective_coeff = compute_effective_convection_coeff(pressure_Δ,temperature_air,pressure_humidity, scenario)
+    effective_body_convective_coeff = compute_effective_convection_coeff(pressure_Δ,temperature_air,pressure_humidity, scenario.atmospheric_pressure)
     convection_with_room = convection_exchange(temperature_air, body_temperature, body_surface_area, effective_body_convective_coeff )
     evap_cooling = evaporation_cooling(temperature_air, pressure_humidity)
     return radiation_with_room+radiation_with_stove+convection_with_room-evap_cooling
 end
 
-function _heat_into_humans(results::SaunaResults, scenario::SaunaScenario)
+function heat_into_humans(results::SaunaResults, scenario::SaunaScenario)
     pressure_itp = interpolate((results.times,), results.pressures_humidity, Gridded(Linear()))
     pressures_Δ = map(time->Interpolations.gradient(pressure_itp,time)[1], results.times)
     map(results.temperatures_air, results.temperatures_room, results.pressures_humidity, results.temperatures_stove, pressures_Δ) do temperature_air, temperature_room, pressure_humidity, temperature_stove, pressure_Δ
-        _heat_into_humans(temperature_air, temperature_room, pressure_humidity, temperature_stove, pressure_Δ,scenario)
+        heat_into_humans(temperature_air, temperature_room, pressure_humidity, temperature_stove, pressure_Δ,scenario)
     end
 end
 function find_human_temperature(human_heat_input::Vector{<:Power}, human_exper_temperatures::Vector{<:Temperature}, times::Vector{<:Time}, air_temperature_start_throwing::Temperature)

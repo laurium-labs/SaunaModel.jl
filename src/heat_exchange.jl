@@ -1,12 +1,21 @@
 """
-Provides an estimate of the raidance power transmitted to a stove in a small fire.
+`radiance_exchange(temperature_1::Temperature, temperature_2::Temperature, area::Area, emissivity=1)::Power`
+Provides an estimate of the raidance power transmitted between two heat sources with a certain area exposure.
 """
 function radiance_exchange(temperature_1::Temperature, temperature_2::Temperature, area::Area, emissivity=1)::Power
     emissivity * uconvert(W, σ * (uconvert(K,temperature_1)^4 - uconvert(K, temperature_2)^4) * uconvert(m^2, area) )
 end
+"""
+`convection_exchange(temperature_1::Temperature, temperature_2::Temperature, area::Area, convective_coeff )::Power`
+Provides an estimate of convective power exchange on an area. Convection coefficient estimation is an important and difficult part of this.
+"""
 function convection_exchange(temperature_1::Temperature, temperature_2::Temperature, area::Area, convective_coeff )::Power
     uconvert(W,convective_coeff*(uconvert(K,temperature_1)-uconvert(K,temperature_2)) * area)
 end 
+"""
+`conduction_exchange_wall(temperature_room::Temperature, temperature_outside::Temperature, room::Room)::Power`
+Provides an estimate of heat loss through the walls of the sauna.
+"""
 function conduction_exchange_wall(temperature_room::Temperature, temperature_outside::Temperature, room::Room)::Power
     uconvert(W, (uconvert(K,temperature_room) - uconvert(K, temperature_outside))*outer_surface_area(room)/room.thickness_insulation*room.conduction_coeff)
 end
