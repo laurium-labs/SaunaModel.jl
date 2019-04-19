@@ -33,19 +33,16 @@ function get_json_description(object::Any)
     end
     return json
 end
-
+"""
+Submit job description here, get a dictionary of values back. Temperatures are in Farenheit, humidity is in Pa, and power is in Watts.
+"""
 function dictionary_api(dictionary_sauna_specification::Dict)::Dict
     scenario = apply_json_mutations(SaunaDefaults.default_scenario, dictionary_sauna_specification)
     extract_results(solve_sauna(scenario), scenario)
 end
 """
-Submit json description here, get json back. Temperatures are in Farenheit, humidity is in Pa, and power is in Watts.
-"""
-function json_api(json_input::AbstractString)::String
-    return JSON.json(dictionary_api(JSON.parse(json_input)))
-end
-"""
-Returns a default json configuration
+Returns a default json configuration --for example
+```\"initial_temperature_air\":{\"val\":51,\"unit\":\"°F\"}```
 """
 function get_default_scenario_json()::String
     return JSON.json(get_json_description(SaunaDefaults.default_scenario))

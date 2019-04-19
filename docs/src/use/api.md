@@ -1,10 +1,10 @@
 # SaunaModel API
 
-The sauna model api is fairly straight forward to use. An example json to submit as a job can be obtained by calling the ```get_default_scenario_json``` function.
+The sauna model api is fairly straight forward to use. An example json to submit as a job can be obtained by calling the ```get_default_scenario_json``` function. For example 
 ```@docs
 get_default_scenario_json
 ```
-Edit the default as needed, or use as a guide, and submit to ```json_api```.
+Use these defaults as a guide to use the ```dictionary_api``` -- only one value, of the unit that was returned in ```get_default_scenario_json``` must be submitted.
 ```@docs
-json_api
+dictionary_api
 ```

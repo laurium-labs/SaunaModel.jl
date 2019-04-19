@@ -86,7 +86,7 @@ We will believe them that they are twice as efficent as a sauna stove
 fire_steady_state(surface_area_board::Area)::Power = 125000W/m^2 * uconvert(m^2,surface_area_board)*.4
 
 export Stove, Room, SaunaNoWater, SteamThrowing, Fire, SaunaScenario, 
-SaunaResults, solve_sauna, json_api, get_default_scenario_json, 
+SaunaResults, solve_sauna, dictionary_api, get_default_scenario_json, 
 build_sauna_model, throw_steam!,steam_throwing,
 compute_effective_convection_coeff,surface_moisture_resistance, 
 evaporation_cooling, skin_moisture_resistance, heat_into_humans,
