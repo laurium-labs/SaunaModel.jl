@@ -10,8 +10,8 @@ const body_temperature = 37°C
 const view_factor_stove = .1
 const sweating_efficency = .6
 const skin_moisture_resistance_itp = let
-    temperatures = [30°C,40°C,50°C, 55°C ]
-    results = [.032m^2*kPa/W, .0125m^2*kPa/W, .0062m^2*kPa/W, .0037m^2*kPa/W]
+    temperatures = [30°C,40°C,50°C, 55°C, 70°C ]
+    results = [.032m^2*kPa/W, .0125m^2*kPa/W, .0062m^2*kPa/W, .0037m^2*kPa/W, .0018m^2*kPa/W]
     itp = interpolate((temperatures,), results, Gridded(Linear()))
     extrapolate(itp, Flat())
 end
@@ -40,7 +40,7 @@ const air_thermal_conductivity_itp = let
     extrapolate(itp, Line())
 end 
 """
-`skin_moisture_resistance(pressure_humidity::Pressure)` takes the air temperature as an argument and returns surface moisture resistance.
+`skin_moisture_resistance(temperature_air::Temperature)` takes the air temperature as an argument and returns surface moisture resistance.
 Data is drawn from:
 The Assessment of Sultriness. Part I: A Temperature-Humidity Index Based on Human Physiology and Clothing Science -Steadman
 Table 3
