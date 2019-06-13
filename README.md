@@ -7,5 +7,4 @@ To use, install julia, then run from the REPL
 `] add https://github.com/bhalonen/SaunaModel.jl` (the directive `]` causes julia to enter `pkg>` mode)
 
 Then, re-enter `julia>` mode, and run 
-`using SaunaModel:json_api
-json_api("{}")`
+`using SaunaModel:dictionary_api;dictionary_api(Dict())`
