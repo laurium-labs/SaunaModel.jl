@@ -1,5 +1,5 @@
 # SaunaModel
-[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://bhalonen.github.io/SaunaModel.jl/)
+[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://laurium-labs.github.io/SaunaModel.jl/)
 
 This package is estimate of how a lumped sum sauna would behave. A lumped sum system modeling means approximating each component of the system with one number. This is a rough and ready approximation: obviously, the stove isn't all one temperature, and the air has has a very complex fluid dynamics problem, which could heat a small sized sauna with the heat given off with all the computers needed to solve in granular detail.
 
